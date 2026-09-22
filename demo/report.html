@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>比比 · 对比报告（演示）</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.rp-nav{display:flex;align-items:center;gap:10px;padding:10px 16px;position:sticky;top:0;background:var(--canvas);z-index:60;border-bottom:1px solid var(--line)}
+.rp-nav .back{font-size:20px;cursor:pointer;color:var(--ink)}
+.rp-nav .t{font-size:17px;font-weight:700;color:var(--ink)}
+.rp-nav .t em{font-style:normal;color:var(--red)}
+/* 商品头卡（客观条件层） */
+.hd{position:sticky;top:44px;background:var(--canvas);z-index:55;box-shadow:var(--shadow-sticky)}
+.hd-head{display:flex;align-items:center;justify-content:space-between;padding:8px 16px 0}
+.hd-title{font-size:11px;color:var(--sub);font-weight:600;letter-spacing:2px}
+.hd-fold-btn{font-size:11px;color:var(--sub);background:var(--surface);border-radius:10px;padding:3px 10px;cursor:pointer}
+.hd.fold .hd-head,.hd.fold .hd-grid{display:none}
+.hd-mini{display:none;padding:10px 16px;align-items:center;gap:8px;cursor:pointer}
+.hd.fold .hd-mini{display:flex}
+.hd-mini-t{font-size:11px;color:var(--sub);margin-left:4px}
+.hd-grid{display:grid;grid-template-columns:repeat(var(--n),1fr);padding:8px 16px 12px;transition:.2s}
+.hd-cell{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:0 4px}
+.hd-thumb{width:56px;height:56px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 1px 5px rgba(0,0,0,.08)}
+.hd-name{font-size:13px;font-weight:600;color:var(--ink);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hd-price{font-size:14px;color:var(--red);font-weight:700}
+.hd-params{font-size:10px;color:var(--sub);max-width:104px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hd-swap{display:flex;align-items:center;justify-content:center;gap:6px;margin:0 16px 12px;padding:8px 0;border:1px dashed var(--red-line);border-radius:12px;font-size:13px;color:var(--red-deep);font-weight:600;cursor:pointer;background:var(--red-wash)}
+.hd-swap:active{background:var(--red-soft)}
+/* 维度行（行卡制：行首标题 + 单元格微卡网格） */
+.rows{padding:4px 16px 0}
+.row-head{display:flex;align-items:center;gap:6px;padding:16px 0 8px}
+.row-head .nm{font-size:14px;font-weight:700;color:var(--ink)}
+.row-head .ly{font-size:10px;color:var(--sub);background:var(--surface);border-radius:4px;padding:2px 6px}
+.row-head .diff{background:var(--red);color:#fff;font-size:10px;font-weight:600;border-radius:4px;padding:2px 6px}
+.row-cells{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:8px;padding-bottom:8px}
+.cell{background:var(--canvas);border:1px solid var(--line);border-radius:12px;padding:12px 10px;cursor:pointer;transition:background .15s}
+.cell:hover{background:#FFFAFA}
+.cell.nul{cursor:default;border-style:dashed;border-color:var(--line2)}
+.cell.obj{text-align:center}
+.cell .concl{font-size:14px;color:var(--ink);font-weight:600;line-height:1.45}
+.cell .meta{font-size:10px;color:var(--sub);margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.cell.obj .meta{justify-content:center}
+.cell .nulldata{font-size:11px;color:var(--hint);text-align:center;padding:16px 0}
+.cell .objv{font-size:16px;font-weight:700;color:var(--ink)}
+.grp+.grp{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.fold-row{display:flex;align-items:center;gap:8px;padding:13px 14px;color:var(--sub);font-size:13px;cursor:pointer;background:var(--surface);border-radius:12px;margin:4px 0 12px}
+.fold-row .arr{transition:.2s;font-size:10px}
+.fold-row.open .arr{transform:rotate(90deg)}
+.fold-body{display:none;padding-bottom:4px}
+.fold-body.open{display:block}
+.plus-row{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;color:var(--red);font-size:13px;font-weight:600;cursor:pointer;border:1.5px dashed var(--red-line);border-radius:12px;margin:8px 0 16px;transition:background .15s}
+.plus-row:active{background:var(--red-wash)}
+.end-card{margin:20px 16px;border-radius:16px;background:linear-gradient(160deg,var(--red-wash),#FFEEF1);border:1px solid var(--red-line);padding:20px 16px;text-align:center}
+.end-card h3{font-size:17px;color:var(--red-deep)}
+.end-card p{font-size:11px;color:#c07f8a;margin-top:4px}
+.end-btns{display:flex;gap:8px;margin-top:16px}
+.end-b{flex:1;padding:12px 0;border-radius:12px;font-size:14px;font-weight:700;border:1.5px solid var(--red-line);color:var(--red-deep);background:var(--canvas);cursor:pointer;transition:transform .12s}
+.end-b:active{transform:scale(.96)}
+.end-b.small{font-size:13px;padding:9px 0}
+.end-other{margin-top:12px;font-size:13px;color:var(--sub);cursor:pointer;text-decoration:underline dotted}
+.end-share{display:block;margin:12px auto 0;background:var(--canvas);border:1.5px solid var(--red-line);color:var(--red-deep);font-size:13px;padding:9px 26px;border-radius:20px;cursor:pointer}
+.end-done{font-size:14px;color:var(--ink);font-weight:600;padding:8px 0}
+.end-done b{color:var(--red)}
+.statline{text-align:center;font-size:10px;color:var(--hint);margin-top:8px;line-height:1.7}
+.rp-foot{text-align:center;font-size:10px;color:var(--hint);padding:8px 0 32px;line-height:1.8}
+/* 溯源浮层 */
+.ev-dim{font-size:14px;font-weight:700;color:var(--ink)}
+.ev-prod{font-size:11px;color:var(--red);margin-top:2px}
+.ev-item{margin-top:16px}
+.ev-concl{font-size:14px;font-weight:600;color:var(--ink);line-height:1.5}
+.ev-meta{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
+.ev-snip{margin-top:8px;background:var(--surface2);border-left:3px solid var(--line2);padding:10px 12px;border-radius:0 8px 8px 0}
+.ev-snip p{font-size:13px;color:var(--txt);line-height:1.65}
+.ev-snip .src{font-size:10px;color:var(--sub);margin-top:6px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ev-snip .src .rp{color:var(--warn)}
+.ev-note-btn{font-size:11px;color:var(--link);cursor:pointer;flex-shrink:0}
+.sheet-close{position:sticky;top:0;float:right;font-size:20px;color:var(--sub);cursor:pointer;background:var(--canvas);padding-left:10px}
+/* 生成中 */
+.loading-mask{position:fixed;inset:0;background:rgba(255,255,255,.96);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.spinner{width:38px;height:38px;border:3.5px solid #ffe0e6;border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-t{font-size:14px;color:var(--txt)}
+.load-s{font-size:11px;color:var(--sub)}
+/* 修改对比对象抽屉（与购物车抽屉同形态） */
+.bb-mask{position:fixed;top:0;left:50%;transform:translateX(-50%);width:390px;height:100%;background:rgba(0,0,0,.4);z-index:90;opacity:0;pointer-events:none;transition:opacity .25s}
+.bb-mask.show{opacity:1;pointer-events:auto}
+.bb-drawer{position:fixed;top:0;left:calc(50% - 105px);width:300px;height:100%;background:var(--canvas);z-index:95;border-radius:16px 0 0 16px;transform:translateX(100%);visibility:hidden;transition:transform .28s cubic-bezier(.22,.9,.3,1),visibility .28s;box-shadow:-6px 0 24px rgba(0,0,0,.15);display:flex;flex-direction:column}
+.bb-drawer.show{transform:translateX(0);visibility:visible}
+.bb-head{padding:18px 16px 12px;display:flex;align-items:flex-start;gap:10px;border-bottom:1px solid var(--line)}
+.bb-logo{width:34px;height:34px;border-radius:9px;background:var(--red);color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.bb-h1{font-size:14px;font-weight:700;color:var(--ink)}
+.bb-h2{font-size:11px;color:var(--sub);margin-top:2px}
+.bb-close{margin-left:auto;font-size:14px;color:var(--sub);padding:4px 10px;cursor:pointer}
+.bb-list{flex:1;overflow:auto;padding:12px 16px}
+.sw-sec{font-size:11px;color:var(--sub);font-weight:700;margin:4px 0 8px}
+.bb-item{display:flex;align-items:center;gap:10px;padding:10px;background:var(--surface2);border-radius:12px;margin-bottom:8px}
+.bb-thumb{width:44px;height:44px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.bb-iname{font-size:13px;color:var(--ink);font-weight:600;line-height:1.3}
+.bb-iprice{font-size:14px;color:var(--red);font-weight:700;margin-top:2px}
+.bb-iprice span{font-size:10px;color:var(--warn);font-weight:400}
+.bb-rm{margin-left:auto;color:var(--sub);font-size:13px;padding:6px 8px;cursor:pointer;flex-shrink:0}
+.bb-add{margin-left:auto;font-size:13px;color:var(--red-deep);font-weight:700;border:1px solid var(--red-line);border-radius:14px;padding:4px 10px;cursor:pointer;flex-shrink:0;background:var(--canvas)}
+.bb-add:active{background:var(--red-wash)}
+.bb-full{font-size:11px;color:var(--sub);text-align:center;padding:6px 0 2px}
+.bb-foot{padding:12px 16px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:var(--canvas)}
+.bb-hint{font-size:11px;color:var(--sub);text-align:center;margin-bottom:8px}
+.bb-go{width:100%;background:var(--red);color:#fff;font-size:14px;font-weight:700;padding:12px;border-radius:24px;border:none;cursor:pointer;transition:transform .12s}
+.bb-go:active{transform:scale(.98)}
+.bb-go[disabled]{background:var(--dis-bg);color:var(--dis-fg);cursor:not-allowed}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="statusbar"><span>6:15</span><span class="sb-r"><span class="sig"><i></i><i></i><i></i><i></i></span><span class="wifi"></span><span class="batt"></span></span></div>
+
+  <div class="rp-nav">
+    <span class="back" onclick="history.back()">‹</span>
+    <span class="t"><em>比比</em> · 对比报告</span>
+    <span class="badge-demo">演示Demo·数据虚构</span>
+  </div>
+
+  <div class="hd" id="hd"></div>
+  <div class="rows" id="rows"></div>
+  <div class="end-card" id="end"></div>
+  <div class="statline" id="statline"></div>
+  <div class="rp-foot">每条结论可点开查看笔记原文 · 结论只陈列不裁决<br>证据强度：实测视频 &gt; 实测图文 &gt; 开箱 &gt; 观点陈述</div>
+
+  <div class="sheet-mask" id="mask" onclick="closeSheet()"></div>
+  <div class="sheet" id="sheet"></div>
+
+  <div class="bb-mask" id="swMask" onclick="closeSwap()"></div>
+  <aside class="bb-drawer" id="swDrawer">
+    <div class="bb-head">
+      <span class="bb-logo">比</span>
+      <div><div class="bb-h1">比比 · 修改对比对象</div><div class="bb-h2">同类换入换出，最多比 3 件</div></div>
+      <span class="bb-close" onclick="closeSwap()">✕</span>
+    </div>
+    <div class="bb-list" id="swList"></div>
+    <div class="bb-foot"><div class="bb-hint" id="swHint"></div><button class="bb-go" id="swGo" onclick="applySwap()" disabled></button></div>
+  </aside>
+
+  <div class="loading-mask" id="loading">
+    <div class="spinner"></div>
+    <div class="load-t">正在翻笔记…</div>
+    <div class="load-s">抽取证据 → 汇编陈列，只陈列不裁决</div>
+  </div>
+</div>
+
+<script src="assets/demo.js"></script>
+<script src="src/data/knowledge-table.js"></script>
+<script src="src/data/notes-tent.js"></script>
+<script src="src/data/notes-suit.js"></script>
+<script src="src/data/mock-tuples.js"></script>
+<script src="src/pipeline/llm-mock.js"></script>
+<script src="src/pipeline/extractor.js"></script>
+<script src="src/pipeline/assembler.js"></script>
+<script src="src/pipeline/index.js"></script>
+<script>
+let skus=load('bb_skus',SKU_ORDER).filter(id=>SKUS[id]); if(skus.length<2) skus=[...SKU_ORDER];
+let dims=load('bb_dims',['空间','搭建体验','价格','重量']).filter(d=>BibiKnowledgeTable.byName(d));
+let report=null, outcome=null;
+
+document.documentElement.style.setProperty('--n',skus.length);
+document.body.style.setProperty('--n',skus.length);
+
+const LVL=l=>BibiAssembler.LEVEL_LABEL[l]||l;
+
+function renderHead(){
+  document.getElementById('hd').innerHTML=`
+  <div class="hd-head">
+    <span class="hd-title">客观条件</span>
+    <span class="hd-fold-btn" onclick="document.getElementById('hd').classList.toggle('fold')">收起</span>
+  </div>
+  <div class="hd-grid">
+    ${skus.map(id=>{const s=SKUS[id];return `
+    <div class="hd-cell" onclick="location.href='product.html?sku=${id}'">
+      ${skuThumbHtml(s,'hd-thumb')}
+      <span class="hd-name">${s.short}</span><span class="hd-price">¥${s.price}</span>
+      <span class="hd-params">${s.tags.slice(0,3).join(' · ')}</span>
+    </div>`}).join('')}
+  </div>
+  <div class="hd-mini" onclick="document.getElementById('hd').classList.remove('fold')">
+    ${skus.map(id=>skuThumbHtml(SKUS[id],'fb-thumb')).join('')}
+    <span class="hd-mini-t">展开商品信息 ▾</span>
+  </div>
+  <div class="hd-swap" onclick="openSwap()">✎ 修改对比对象</div>`;
+}
+
+function cellHtml(row,sku){
+  const c=row.cells[sku];
+  if(c==null) return `<div class="cell nul"><div class="nulldata">无数据</div></div>`;
+  if(c.type==='obj'){
+    return `<div class="cell obj"><div class="objv ${c.tag?'best':''}">${c.value}</div>${c.tag?`<div class="meta"><span class="tag">${c.tag}</span></div>`:''}</div>`;
+  }
+  return `<div class="cell" onclick="openSheet('${row.dim}','${sku}')">${c.groups.map(g=>`
+    <div class="grp">
+      <div class="concl">${g.conclusion}</div>
+      <div class="meta">
+        <span class="tag">${g.n}条</span><span class="tag tag-lv">${LVL(g.level)}</span><span class="tag">${g.crowd}</span>
+        ${g.divergent?'<span class="tag tag-warn">证据存在分歧</span>':''}
+        ${g.lack?'<span class="tag tag-warn">样本不足</span>':''}
+      </div>
+    </div>`).join('')}</div>`;
+}
+
+function renderRows(){
+  document.getElementById('rows').innerHTML=report.rows.map(row=>`
+    <div class="row">
+      <div class="row-head"><span class="nm">${row.dim}</span>${row.diff?'<span class="diff">差</span>':''}<span class="ly">${row.layer}</span></div>
+      <div class="row-cells">${skus.map(s=>cellHtml(row,s)).join('')}</div>
+    </div>`).join('')
+  +report.foldRows.map((f,i)=>`
+    <div class="fold-row" id="foldrow${i}" onclick="toggleFold(${i})">
+      <span class="arr">▸</span> 折叠 · ${f.dim}：${f.conclusion}（点开看）
+    </div>
+    <div class="fold-body" id="foldbody${i}">
+      <div class="row">
+        <div class="row-head"><span class="nm">${f.dim}</span><span class="ly">${f.layer}</span></div>
+        <div class="row-cells">${skus.map(()=>`<div class="cell obj"><div class="concl">${f.conclusion}</div></div>`).join('')}</div>
+      </div>
+    </div>`).join('')
+  +(report.plusPool.length?`<div class="plus-row" onclick="addDim()">＋ 添加对比维度</div>`:'');
+}
+
+function toggleFold(i){
+  document.getElementById('foldrow'+i).classList.toggle('open');
+  document.getElementById('foldbody'+i).classList.toggle('open');
+}
+
+async function addDim(){
+  const next=report.plusPool[0];
+  if(!next){ toast('预设维度都比完啦'); return; }
+  report=await BibiPipeline.appendDimension({report, dimName:next});
+  renderRows(); renderStats();
+  toast(`已添加「${next}」维度`);
+}
+
+function openSheet(dim,sku){
+  const row=report.rows.find(r=>r.dim===dim); if(!row) return;
+  const c=row.cells[sku]; if(!c||c.type!=='ev') return;
+  const s=SKUS[sku];
+  document.getElementById('sheet').innerHTML=`
+    <div class="sheet-grab"></div>
+    <span class="sheet-close" onclick="closeSheet()">✕</span>
+    <div class="ev-dim">${dim} · 证据溯源</div>
+    <div class="ev-prod">${s.brand} ${s.short}</div>
+    ${c.groups.map(g=>`
+    <div class="ev-item">
+      <div class="ev-concl">${g.conclusion}</div>
+      <div class="ev-meta"><span class="tag">${g.n}条证据</span><span class="tag tag-lv">${LVL(g.level)}</span><span class="tag">${g.crowd}</span>${g.divergent?'<span class="tag tag-warn">证据存在分歧</span>':''}${g.lack?'<span class="tag tag-warn">样本不足</span>':''}</div>
+      ${g.snips.map(sn=>`
+      <div class="ev-snip"><p>"${sn.text}"</p>
+        <div class="src"><span>来自笔记 ${sn.noteId}${sn.isReported?' · <span class="rp">报备商单</span>':''}</span><span class="ev-note-btn" onclick="toast('演示：跳转原笔记（视频带时间点）')">查看原笔记 ›</span></div>
+      </div>`).join('')}
+    </div>`).join('')}`;
+  document.getElementById('mask').style.display='block';
+  document.getElementById('sheet').classList.add('show');
+}
+function closeSheet(){
+  document.getElementById('mask').style.display='none';
+  document.getElementById('sheet').classList.remove('show');
+}
+
+function renderEnd(){
+  const el=document.getElementById('end');
+  if(outcome){
+    el.innerHTML=`<h3>比完啦 🎉</h3>
+      <p>已记录你的决定：${outcome==='none_good'?'都没那么好':outcome==='buy'?'买':outcome==='no_buy'?'不买':'再看看'}（终局埋点已上报）</p>
+      ${outcome==='buy'?`<div style="margin-top:12px;font-size:11px;color:var(--sub)">所选商品：<b style="color:var(--red-deep)">${SKUS[skus[0]].brand} ${SKUS[skus[0]].short}</b> · <span style="text-decoration:underline;cursor:pointer" onclick="toast('演示：跳转商品页（链接展示，不预选中）')">去商品页</span></div>`:''}
+      <button class="end-share" onclick="toast('转发卡已生成（演示）：我也在纠结，帮我看看')">转发给朋友帮我看看</button>`;
+    return;
+  }
+  el.innerHTML=`<h3>比完啦，你的决定是？</h3>
+    <p>买和不买都是好决定——记录下来就好</p>
+    <div class="end-btns">
+      <span class="end-b" onclick="pick('buy')">买</span>
+      <span class="end-b" onclick="pick('no_buy')">不买</span>
+      <span class="end-b" onclick="pick('wait')">再看看</span>
+    </div>
+    <div class="end-other" onclick="pick('none_good')">都没那么好</div>
+    <button class="end-share" onclick="toast('转发卡已生成（演示）：我也在纠结，帮我看看')">转发给朋友帮我看看</button>`;
+}
+function pick(o){ outcome=o; renderEnd(); toast('已记录你的决定'); }
+
+function renderStats(){
+  const st=report.stats; if(!st) return;
+  const parts=[];
+  if(st.discarded) parts.push(`幻觉证据${st.discarded}条`);
+  if(st.violations) parts.push(`导购表述${st.violations}条`);
+  document.getElementById('statline').innerHTML = parts.length
+    ? `证据护栏已拦截：${parts.join('、')}（不进入陈列）${st.needsPromptReview?'<br>丢弃率超10%，已触发抽取Prompt复核':''}`
+    : '';
+}
+
+let swapSet=[];
+function openSwap(){
+  swapSet=[...skus];
+  renderSwap();
+  document.getElementById('swMask').classList.add('show');
+  document.getElementById('swDrawer').classList.add('show');
+}
+function closeSwap(){
+  document.getElementById('swMask').classList.remove('show');
+  document.getElementById('swDrawer').classList.remove('show');
+}
+function rmSwap(id){
+  if(swapSet.length<=2){ toast('至少保留 2 件才能比哦'); return; }
+  swapSet=swapSet.filter(x=>x!==id);
+  renderSwap();
+}
+function addSwap(id){
+  if(swapSet.includes(id)) return;
+  if(swapSet.length>=3){ toast('最多比 3 件哦'); return; }
+  swapSet.push(id);
+  renderSwap();
+}
+function renderSwap(){
+  const cat=SKUS[skus[0]].category;
+  const cand=SKU_POOL.filter(id=>SKUS[id]&&SKUS[id].category===cat&&!swapSet.includes(id)).map(id=>SKUS[id]);
+  document.getElementById('swList').innerHTML=
+    `<div class="sw-sec">当前对比 · ${swapSet.length}/3</div>`
+    +swapSet.map(id=>{const s=SKUS[id];return `<div class="bb-item">${skuThumbHtml(s,'bb-thumb')}
+      <div><div class="bb-iname">${s.brand} · ${s.short}</div>
+      <div class="bb-iprice"><small>¥</small>${s.price} <span>${s.priceTag}</span></div></div>
+      <span class="bb-rm" onclick="rmSwap('${id}')">✕</span></div>`}).join('')
+    +`<div class="sw-sec">可换入的同类候选</div>`
+    +cand.map(s=>`<div class="bb-item">${skuThumbHtml(s,'bb-thumb')}
+      <div><div class="bb-iname">${s.brand} · ${s.short}</div>
+      <div class="bb-iprice"><small>¥</small>${s.price} <span>${s.priceTag}</span></div></div>
+      <span class="bb-add" onclick="addSwap('${s.id}')">＋ 换入</span></div>`).join('')
+    +(swapSet.length>=3?`<div class="bb-full">已满 3 件，移出一件即可换入候选</div>`:'');
+  const btn=document.getElementById('swGo');
+  if(swapSet.length<2){ btn.disabled=true; btn.textContent=`再勾${2-swapSet.length}件就可以比啦`; }
+  else{ btn.disabled=false; btn.textContent=`比一比这 ${swapSet.length} 件`; }
+  document.getElementById('swHint').textContent = swapSet.length<2 ? '最多比 3 件 · 演示数据虚构' : '换入换出后重新翻笔记，生成新报告';
+}
+function applySwap(){
+  if(swapSet.length<2) return;
+  const changed = swapSet.length!==skus.length || swapSet.some(id=>!skus.includes(id));
+  if(!changed){ closeSwap(); toast('对比对象没有变化'); return; }
+  store('bb_skus',swapSet);
+  location.reload();
+}
+
+async function init(){
+  const n=BibiNotes.NOTES.filter(x=>skus.includes(x.sku_id)).length;
+  document.querySelector('.load-t').textContent=`正在翻 ${n} 篇笔记…`;
+  report=await BibiPipeline.buildReport({skuIds:skus, dimNames:dims});
+  document.getElementById('loading').style.display='none';
+  renderHead(); renderRows(); renderEnd(); renderStats();
+}
+init();
+</script>
+</body>
+</html>

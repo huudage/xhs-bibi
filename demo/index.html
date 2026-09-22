@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>小红书 · 首页（演示复刻）</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.home-nav{display:flex;align-items:center;padding:8px 14px 10px;background:var(--canvas);position:sticky;top:0;z-index:50}
+.nav-l{display:flex;align-items:center;flex-shrink:0}
+.loc{font-size:11px;color:var(--sub);flex-shrink:0;cursor:pointer}
+.tabs{flex:1;display:flex;justify-content:center;gap:22px}
+.tab{font-size:17px;color:var(--sub);position:relative;cursor:pointer;padding:2px 1px}
+.tab.on{color:var(--ink);font-weight:700}
+.tab.on::after{content:'';position:absolute;left:50%;transform:translateX(-50%);bottom:-6px;width:18px;height:3px;background:var(--red);border-radius:2px}
+.nav-r{display:flex;align-items:center;flex-shrink:0}
+.search-entry{display:flex;align-items:center;justify-content:center;width:30px;height:30px;cursor:pointer}
+.search-entry svg{width:21px;height:21px}
+.feed{column-count:2;column-gap:10px;padding:6px 12px 90px;background:var(--canvas)}
+.note{break-inside:avoid;margin-bottom:10px;border-radius:10px;overflow:hidden;background:var(--canvas);cursor:default}
+.note-cover{width:100%;display:flex;align-items:center;justify-content:center;font-size:44px;position:relative}
+.note-cover.sm{height:130px}.note-cover.md{height:170px}.note-cover.lg{height:200px}
+.note-cover .play{position:absolute;right:8px;bottom:8px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center}
+.note-cover .play::after{content:'';border-left:7px solid #fff;border-top:4.5px solid transparent;border-bottom:4.5px solid transparent;margin-left:2px}
+.note-body{padding:7px 9px 9px}
+.note-title{font-size:13px;color:var(--ink);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.note-meta{display:flex;align-items:center;gap:5px;margin-top:7px}
+.note-ava{width:16px;height:16px;border-radius:50%;flex-shrink:0}
+.note-author{font-size:11px;color:var(--sub);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.note-like{font-size:11px;color:var(--sub);display:flex;align-items:center;gap:2px}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="statusbar"><span>6:11</span><span class="sb-r"><span class="sig"><i></i><i></i><i></i><i></i></span><span class="wifi"></span><span class="batt"></span></span></div>
+
+  <header class="home-nav">
+    <div class="nav-l">
+      <a class="search-entry" href="search.html?mode=prefill3" title="点点搜索">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="7"/><line x1="16" y1="16" x2="21.5" y2="21.5"/></svg>
+      </a>
+    </div>
+    <nav class="tabs">
+      <span class="tab" onclick="toast('演示：仅比比链路可交互')">关注</span>
+      <span class="tab on">发现</span>
+      <span class="tab" onclick="toast('演示：仅比比链路可交互')">消息</span>
+    </nav>
+    <div class="nav-r">
+      <span class="loc" onclick="toast('演示：定位不可用')">杭州 ▾</span>
+    </div>
+  </header>
+
+  <main class="feed" id="feed"></main>
+
+  <nav class="bnav">
+    <span class="bnav-item on"><span class="ic">🏠</span>首页</span>
+    <a class="bnav-item" href="market.html"><span class="ic">🛍️</span>市集</a>
+    <span class="bnav-plus" onclick="toast('演示：仅比比链路可交互')">＋</span>
+    <span class="bnav-item"><span class="ic">💬</span><em class="bnav-bd">21</em>消息</span>
+    <span class="bnav-item"><span class="ic">👤</span>我</span>
+  </nav>
+</div>
+
+<script src="assets/demo.js"></script>
+<script>
+const NOTES=[
+ {t:'公园野餐帐篷怎么选？新手看完再买',a:'露营小白栗',l:'1.2万',e:'⛺',g:['#9ed4f2','#3d8fc4'],h:'lg',play:1},
+ {t:'155小个子西装怎么选？oversize慎入会压身高',a:'155通勤日记',l:8231,e:'🧥',g:['#e3d5f7','#a98fd8'],h:'md'},
+ {t:'致知vs茉寻西装实测，版型差在哪一次说清',a:'西装打工人阿茉',l:'3.2万',e:'🥼',g:['#f2d5d9','#d892a2'],h:'lg',play:1},
+ {t:'155小个子帐篷实测｜3款横向对比不踩雷',a:'小个子露营记',l:4521,e:'🏕️',g:['#f7cf96','#e8963f'],h:'sm',play:1},
+ {t:'165+大骨架西装攻略，别再买小码了',a:'170穿搭日志',l:2760,e:'👗',g:['#d9e8f7','#8fb8dd'],h:'md'},
+ {t:'3秒速开帐篷第二年使用报告，真实体验',a:'158cm野餐党',l:986,e:'🌳',g:['#bfe8cf','#68bb8c'],h:'lg',play:1},
+ {t:'通勤西装一周5套不重样｜微胖显瘦思路',a:'打工人衣橱',l:'1.5万',e:'💼',g:['#ffe9b8','#f3c15f'],h:'sm',play:1},
+ {t:'羊毛vs涤纶西装垂感对比，贵的是智商税吗',a:'面料党小K',l:943,e:'🧵',g:['#d8e4f5','#8aa8d6'],h:'md'},
+];
+const AVA=['#f8b5c0','#9ed4f2','#c8f0d8','#f7cf96','#a5a8f0','#f2c9a0','#8fd8c8','#e8a5c8'];
+document.getElementById('feed').innerHTML=NOTES.map((n,i)=>`
+<div class="note">
+  <div class="note-cover ${n.h}" style="background:linear-gradient(140deg,${n.g[0]},${n.g[1]})">${n.e}${n.play?'<span class="play"></span>':''}</div>
+  <div class="note-body">
+    <div class="note-title">${n.t}</div>
+    <div class="note-meta">
+      <span class="note-ava" style="background:${AVA[i%AVA.length]}"></span>
+      <span class="note-author">${n.a}</span>
+      <span class="note-like">♡ ${n.l}</span>
+    </div>
+  </div>
+</div>`).join('');
+</script>
+</body>
+</html>

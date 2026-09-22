@@ -1,0 +1,9 @@
+# 外部克隆的参考仓（各自带 .git，不纳入本项目跟踪）
+/PM-SKILLS/
+/awesome-design-md/
+/spec-kit/
+
+# OS
+Thumbs.db
+desktop.ini
+.DS_Store

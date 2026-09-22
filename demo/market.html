@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>小红书 · 市集（演示复刻）</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.m-search{display:flex;align-items:center;gap:8px;padding:8px 12px}
+.m-search-box{flex:1;display:flex;align-items:center;gap:7px;background:var(--surface);border-radius:18px;padding:8px 12px}
+.m-search-box .ic{font-size:13px}
+.m-search-box .q{font-size:13px;color:var(--txt)}
+.m-btn{background:var(--red);color:#fff;font-size:13px;padding:7px 16px;border-radius:16px;cursor:default}
+.cat-tabs{display:flex;gap:18px;padding:4px 14px 10px;overflow-x:auto;white-space:nowrap}
+.cat-tabs span{font-size:13px;color:var(--sub);flex-shrink:0;cursor:default}
+.cat-tabs span.on{color:var(--red);font-weight:700;position:relative}
+.cat-tabs span.on::after{content:'';position:absolute;left:50%;transform:translateX(-50%);bottom:-5px;width:16px;height:3px;background:var(--red);border-radius:2px}
+.quick{display:grid;grid-template-columns:repeat(5,1fr);gap:14px 4px;padding:8px 14px 14px}
+.qi{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:default}
+.qi-ic{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:21px;position:relative}
+.qi-t{font-size:11px;color:var(--sub)}
+.qi-hot{position:absolute;top:-3px;right:-16px;background:var(--warn-bg2);color:var(--warn);font-size:10px;padding:1px 5px;border-radius:8px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 12px 90px}
+.pcard{border-radius:12px;overflow:hidden;background:var(--canvas);cursor:pointer;position:relative}
+.pcard.inert{cursor:default}
+.p-cover{width:100%;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;font-size:52px;position:relative}
+.p-flag{position:absolute;top:8px;left:8px;background:var(--red);color:#fff;font-size:10px;padding:2px 7px;border-radius:4px}
+.p-star{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.92);border-radius:14px;padding:3px 8px;font-size:13px;display:flex;align-items:center;gap:3px;cursor:pointer}
+.p-star.on{color:#ffb400}
+.p-star .sn{font-size:10px;color:var(--sub)}
+.p-body{padding:8px 10px 10px}
+.p-title{font-size:13px;color:var(--ink);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:36px}
+.p-price-row{display:flex;align-items:baseline;gap:6px;margin-top:6px}
+.p-price{color:var(--red);font-size:16px;font-weight:700}
+.p-price small{font-size:11px}
+.p-off{font-size:10px;color:var(--warn);background:var(--warn-bg2);padding:1px 5px;border-radius:4px}
+.p-sales{font-size:11px;color:var(--sub);margin-top:5px}
+/* 比比入口B（F47竖条/F48口径回调）：右缘竖条=比比入口 + 购物车抽屉：勾选开比 */
+.bb-rail{position:fixed;top:44%;left:calc(50% + 195px);transform:translateX(-100%);z-index:85;background:linear-gradient(180deg,#ff6a82,var(--red));color:#fff;padding:14px 7px;border-radius:14px 0 0 14px;box-shadow:var(--shadow-rail);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px}
+.bb-rail-t{writing-mode:vertical-rl;letter-spacing:5px;font-size:13px;font-weight:700}
+.bb-mask{position:fixed;top:0;left:50%;transform:translateX(-50%);width:390px;height:100%;background:rgba(0,0,0,.4);z-index:90;opacity:0;pointer-events:none;transition:opacity .25s}
+.bb-mask.show{opacity:1;pointer-events:auto}
+.bb-drawer{position:fixed;top:0;left:calc(50% - 105px);width:300px;height:100%;background:var(--canvas);z-index:95;border-radius:16px 0 0 16px;transform:translateX(100%);visibility:hidden;transition:transform .28s cubic-bezier(.22,.9,.3,1),visibility .28s;box-shadow:-6px 0 24px rgba(0,0,0,.15);display:flex;flex-direction:column}
+.bb-drawer.show{transform:translateX(0);visibility:visible}
+.bb-head{padding:18px 16px 12px;display:flex;align-items:flex-start;gap:10px;border-bottom:1px solid var(--line)}
+.bb-logo{width:34px;height:34px;border-radius:9px;background:var(--red);color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.bb-h1{font-size:14px;font-weight:700;color:var(--ink)}
+.bb-h2{font-size:11px;color:var(--sub);margin-top:2px}
+.bb-close{margin-left:auto;font-size:14px;color:var(--sub);padding:4px 10px;cursor:pointer}
+.bb-list{flex:1;overflow:auto;padding:12px 16px}
+.bb-item{display:flex;align-items:center;gap:10px;padding:10px;background:var(--surface2);border-radius:12px;margin-bottom:8px}
+.bb-thumb{width:44px;height:44px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.bb-iname{font-size:13px;color:var(--ink);font-weight:600;line-height:1.3}
+.bb-iprice{font-size:14px;color:var(--red);font-weight:700;margin-top:2px}
+.bb-iprice span{font-size:10px;color:var(--warn);font-weight:400}
+.bb-rm{margin-left:auto;color:var(--sub);font-size:13px;padding:6px 8px;cursor:pointer;flex-shrink:0}
+.bb-ck{width:20px;height:20px;border:2px solid var(--line2);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;cursor:pointer;user-select:none}
+.bb-ck.on{background:var(--red);border-color:var(--red)}
+.bb-empty{text-align:center;padding:36px 20px;color:var(--sub)}
+.bb-empty-ic{font-size:34px;margin-bottom:10px}
+.bb-empty-t{font-size:14px;font-weight:600;color:var(--txt)}
+.bb-empty-s{font-size:13px;line-height:1.7;margin-top:6px}
+.bb-foot{padding:12px 16px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:var(--canvas)}
+.bb-hint{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--sub);margin-bottom:8px}
+.bb-hint #bbHint{flex:1}
+.bb-gosearch{color:var(--link);flex-shrink:0;cursor:pointer}
+.bb-go{width:100%;background:var(--red);color:#fff;font-size:14px;font-weight:700;padding:12px;border-radius:24px;border:none;cursor:pointer;transition:transform .12s}
+.bb-go:active{transform:scale(.98)}
+.bb-go[disabled]{background:var(--dis-bg);color:var(--dis-fg);cursor:not-allowed}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="statusbar"><span>6:12</span><span class="sb-r"><span class="sig"><i></i><i></i><i></i><i></i></span><span class="wifi"></span><span class="batt"></span></span></div>
+
+  <div class="m-search">
+    <div class="m-search-box"><span class="ic">🏕️</span><span class="q">牧高笛帐篷</span></div>
+    <span class="m-btn">搜索</span>
+  </div>
+
+  <div class="cat-tabs" id="cats"></div>
+
+  <div class="quick" id="quick"></div>
+
+  <div style="height:8px;background:var(--surface)"></div>
+  <div class="grid" id="grid"></div>
+
+  <span class="bb-rail" onclick="openBasket()"><span class="bb-rail-t">比比</span></span>
+  <div class="bb-mask" id="bbMask" onclick="closeBasket()"></div>
+  <aside class="bb-drawer" id="bbDrawer">
+    <div class="bb-head">
+      <span class="bb-logo">🛒</span>
+      <div><div class="bb-h1">购物车 · 勾选开比</div><div class="bb-h2">勾选同类商品开比，一次最多 3 件</div></div>
+      <span class="bb-close" onclick="closeBasket()">✕</span>
+    </div>
+    <div class="bb-list" id="bbList"></div>
+    <div class="bb-foot"><div class="bb-hint"><span id="bbHint"></span><span class="bb-gosearch" onclick="location.href='search.html?from=cart'">去点点搜搜 ↗</span></div><button class="bb-go" id="bbGo" onclick="goCompare()" disabled></button></div>
+  </aside>
+
+  <nav class="bnav">
+    <a class="bnav-item" href="index.html"><span class="ic">🏠</span>首页</a>
+    <span class="bnav-item on"><span class="ic">🛍️</span>市集</span>
+    <span class="bnav-plus">＋</span>
+    <span class="bnav-item"><span class="ic">💬</span><em class="bnav-bd">10</em>消息</span>
+    <span class="bnav-item"><span class="ic">👤</span>我</span>
+  </nav>
+</div>
+
+<script src="assets/demo.js"></script>
+<script>
+const CATS=['推荐','户外','女装','食饮','家居','美护','生鲜','潮玩','运动'];
+let curCat='推荐';
+function renderCats(){
+  document.getElementById('cats').innerHTML=
+   CATS.map(c=>`<span class="${c===curCat?'on':''}" onclick="swCat('${c}')">${c}</span>`).join('');
+}
+function swCat(c){ curCat=c; renderCats(); renderGrid(); }
+
+const QUICK=[
+ ['🔴','直播广场','linear-gradient(135deg,#ffd3d3,#ff8a8a)'],['🌙','星光夜市','linear-gradient(135deg,#d9dcff,#93a2f5)'],
+ ['🎬','超级合拍','linear-gradient(135deg,#d3f4ff,#7cc9ef)','86万'],['🛍️','好货市场','linear-gradient(135deg,#ffe6c7,#f5b96b)'],
+ ['💝','宠粉清单','linear-gradient(135deg,#ffd9ec,#f79ac4)'],['📦','我的订单','linear-gradient(135deg,#e2e2e6,#a9a9b3)'],
+ ['🛒','购物车','linear-gradient(135deg,#d3f0dd,#8bc9a5)',null,1],['🎟️','优惠券','linear-gradient(135deg,#fff0c2,#f2cf6b)'],
+ ['💬','客服消息','linear-gradient(135deg,#d9e9ff,#8fb6ec)'],['👣','商品足迹','linear-gradient(135deg,#f0e2ff,#b99ce8)']
+];
+document.getElementById('quick').innerHTML=QUICK.map(q=>
+ `<div class="qi" ${q[4]?'style="cursor:pointer" onclick="openBasket()"':''}><span class="qi-ic" style="background:${q[2]}">${q[0]}${q[3]?`<span class="qi-hot">${q[3]}</span>`:''}</span><span class="qi-t">${q[1]}</span></div>`).join('');
+
+// 购物车（F46 与购物车合并；F48 口径回调：收集侧称购物车，比比仅指比较界面）：☆ 收进购物车，竖条/金刚区唤起抽屉勾选开比
+let cart=load('bb_cart',[]);
+const ck={};
+cart.forEach(id=>ck[id]=true);
+function inCart(id){ return cart.includes(id); }
+function skuCards(list){
+  return list.map(s=>`
+  <div class="pcard" onclick="location.href='product.html?sku=${s.id}'">
+    <div class="p-cover" style="background:linear-gradient(140deg,${s.grad[0]},${s.grad[1]})">${s.emoji}
+      ${s.flag?`<span class="p-flag">${s.flag}</span>`:''}
+      <span class="p-star ${inCart(s.id)?'on':''}" onclick="event.stopPropagation();toggleStar('${s.id}')">
+        ${inCart(s.id)?'★':'☆'}<span class="sn">${s.starCount}</span>
+      </span>
+    </div>
+    <div class="p-body">
+      <div class="p-title">${s.name}</div>
+      <div class="p-price-row"><span class="p-price"><small>¥</small>${s.price}</span><span class="p-off">${s.priceTag}</span></div>
+      <div class="p-sales">${s.sold} · ${s.tags[0]} · ${s.notes||12}篇笔记讨论</div>
+    </div>
+  </div>`).join('');
+}
+const DRINKS=`
+  <div class="pcard inert" onclick="toast('演示：仅帐篷与女装类目接入比比链路')">
+    <div class="p-cover" style="background:linear-gradient(140deg,#c9ecc9,#79c379)">🥫
+      <span class="p-star">☆<span class="sn">4.6</span></span>
+    </div>
+    <div class="p-body">
+      <div class="p-title">魔爪能量风味饮料 维生素功能饮料 330ml*6罐</div>
+      <div class="p-price-row"><span class="p-price"><small>¥</small>9.9</span><span class="p-off">立减10元</span></div>
+      <div class="p-sales">6000+人加购 · 已售6.9万+</div>
+    </div>
+  </div>
+  <div class="pcard inert" onclick="toast('演示：仅帐篷与女装类目接入比比链路')">
+    <div class="p-cover" style="background:linear-gradient(140deg,#ffd9d9,#ee8f8f)">🥤</div>
+    <div class="p-body">
+      <div class="p-title">可口可乐 魔爪联名限定款气泡饮料 500ml</div>
+      <div class="p-price-row"><span class="p-price"><small>¥</small>10.9</span><span class="p-off">满20减10</span></div>
+      <div class="p-sales">8000+人加购 · 已售7571</div>
+    </div>
+  </div>`;
+function catList(){
+  if(curCat==='推荐') return SKU_POOL.map(k=>SKUS[k]);
+  if(curCat==='户外') return SKU_POOL.filter(k=>SKUS[k].category==='tent').map(k=>SKUS[k]);
+  if(curCat==='女装') return SKU_POOL.filter(k=>SKUS[k].category==='suit').map(k=>SKUS[k]);
+  if(curCat==='食饮') return [];
+  return null;
+}
+function renderGrid(){
+  const list=catList();
+  if(list===null){
+    document.getElementById('grid').innerHTML=`
+      <div style="grid-column:1/-1;text-align:center;padding:56px 20px;color:var(--sub);font-size:13px;line-height:2">
+        <div style="font-size:34px">🧺</div>「${curCat}」类目演示未接入<br>试试「户外」或「女装」，点亮 ☆ 收进购物车
+      </div>`;
+    return;
+  }
+  const withDrinks = (curCat==='推荐'||curCat==='户外'||curCat==='食饮');
+  document.getElementById('grid').innerHTML = skuCards(list) + (withDrinks?DRINKS:'');
+}
+function toggleStar(id){
+  if(inCart(id)){
+    cart=cart.filter(x=>x!==id);
+    delete ck[id];
+    toast('已移出购物车');
+  }else{
+    cart.push(id);
+    ck[id]=true;
+    toast('已加入购物车，勾选同类即可开比');
+  }
+  store('bb_cart',cart);
+  renderGrid(); renderBasket();
+}
+function selList(){ return cart.filter(id=>ck[id]); }
+function rmBasket(id){ cart=cart.filter(x=>x!==id); delete ck[id]; store('bb_cart',cart); renderGrid(); renderBasket(); }
+function tgCk(id){ ck[id]=!ck[id]; renderBasket(); }
+function renderBasket(){
+  let html=cart.map(id=>{
+    const k=SKUS[id];
+    return `<div class="bb-item">${skuThumbHtml(k,'bb-thumb')}
+      <div><div class="bb-iname">${k.brand} · ${k.short}</div>
+      <div class="bb-iprice"><small>¥</small>${k.price} <span>${k.priceTag}</span></div></div>
+      <span class="bb-ck ${ck[id]?'on':''}" onclick="tgCk('${id}')">${ck[id]?'✓':''}</span>
+      <span class="bb-rm" onclick="rmBasket('${id}')">✕</span></div>`;
+  }).join('');
+  if(!cart.length){
+    html=`<div class="bb-empty"><div class="bb-empty-ic">🛒</div><div class="bb-empty-t">购物车还是空的</div>
+      <div class="bb-empty-s">点亮商品卡右上角 ☆ 收进购物车<br>勾选 2 件同类商品即可开比</div></div>`;
+  }
+  document.getElementById('bbList').innerHTML=html;
+  const sel=selList();
+  const btn=document.getElementById('bbGo');
+  if(sel.length===0){ btn.disabled=true; btn.textContent='先勾选想比的商品'; }
+  else if(sel.length===1){ btn.disabled=true; btn.textContent='再勾 1 件就可以比啦'; }
+  else{ btn.disabled=false; btn.textContent=`比一比勾选的 ${sel.length} 件`; }
+  document.getElementById('bbHint').textContent = sel.length<2 ? '同类目勾选 2-3 件开比 · 演示数据虚构' : '跨类目勾选将自动排除 · AI 只陈列笔记证据，不替你做决定';
+}
+function openBasket(){ renderBasket(); document.getElementById('bbMask').classList.add('show'); document.getElementById('bbDrawer').classList.add('show'); }
+function closeBasket(){ document.getElementById('bbMask').classList.remove('show'); document.getElementById('bbDrawer').classList.remove('show'); }
+function goCompare(){
+  const sel=selList();
+  if(!sel.length){ toast('先勾选想比的商品'); return; }
+  // 边界（F46）：市集页无当前浏览商品，以首个勾选项类目为准，自动排除其他类目
+  const cat=SKUS[sel[0]].category;
+  const same=sel.filter(id=>SKUS[id].category===cat);
+  const out=sel.length-same.length;
+  if(same.length>3){ toast('一次最多比 3 件，先取消勾选多余商品'); return; }
+  if(same.length<2){
+    toast(out?`已自动排除其他类目 ${out} 件，同类目再勾 ${2-same.length} 件才能比`:'同类目至少勾选 2 件才能比哦');
+    return;
+  }
+  if(out) toast(`已自动排除其他类目 ${out} 件，比比仅支持同类目对比`);
+  store('bb_skus',same);
+  location.href='dimensions.html';
+}
+renderCats(); renderGrid(); renderBasket();
+</script>
+</body>
+</html>

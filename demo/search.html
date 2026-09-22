@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>点点 · 泛搜结果（演示）</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.dd-top{display:flex;align-items:center;gap:10px;padding:10px 14px;position:sticky;top:0;background:var(--canvas);z-index:50}
+.dd-top .back{font-size:20px;cursor:pointer;color:var(--ink)}
+.dd-box{flex:1;display:flex;align-items:center;gap:8px;background:var(--surface);border-radius:18px;padding:8px 14px}
+.dd-box .q{font-size:13px;color:var(--txt);flex:1}
+.dd-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#FF7A90,var(--red));display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0}
+.guide{margin:10px 12px;background:var(--canvas);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.guide-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.guide-head .gt{font-size:14px;font-weight:700;color:var(--ink)}
+.guide-head .gsub{font-size:11px;color:var(--red);background:var(--red-soft);padding:2px 8px;border-radius:10px}
+.g-sec{margin-bottom:12px}
+.g-sec h5{font-size:13px;color:var(--ink);margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.g-sec h5 .tag{font-size:10px;color:var(--sub);background:var(--surface);padding:1px 6px;border-radius:4px;font-weight:400}
+.g-sec p{font-size:13px;color:var(--txt);line-height:1.65}
+.g-link{color:var(--red-deep);font-weight:600}
+.g-sec ul{margin:4px 0 0 2px;list-style:none}
+.g-sec li{font-size:13px;color:var(--txt);line-height:1.7;padding-left:14px;position:relative}
+.g-sec li::before{content:'·';position:absolute;left:2px;color:var(--sub);font-weight:700}
+.sec-label{display:flex;align-items:center;gap:8px;padding:12px 16px 4px}
+.sec-label b{font-size:14px;color:var(--ink)}
+.sec-label span{font-size:11px;color:var(--sub)}
+.sku-card{margin:8px 12px;display:flex;gap:12px;border-radius:14px;border:1.5px solid var(--line);padding:10px;position:relative;cursor:pointer;transition:border-color .18s,background .18s;background:var(--canvas)}
+.sku-card.sel{border-color:var(--red);background:#FFFAFA}
+.sku-thumb{width:86px;height:86px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;box-shadow:0 1px 5px rgba(0,0,0,.08)}
+.sku-info{flex:1;min-width:0;padding-right:22px}
+.sku-name{font-size:13px;font-weight:600;line-height:1.4;color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sku-meta{margin-top:5px;display:flex;align-items:baseline;gap:8px}
+.sku-price{color:var(--red);font-size:16px;font-weight:700}
+.sku-sold{font-size:11px;color:var(--sub)}
+.sku-tags{margin-top:6px;display:flex;flex-wrap:wrap;gap:5px}
+.sku-tags span{font-size:10px;color:var(--sub2);background:var(--surface);padding:2px 7px;border-radius:4px}
+.cb{position:absolute;top:12px;right:12px;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line2);display:flex;align-items:center;justify-content:center;opacity:0;transition:.15s;background:var(--canvas)}
+.cb.show{opacity:1}
+.cb.on{background:var(--red);border-color:var(--red)}
+.cb.on::after{content:'✓';color:#fff;font-size:12px;font-weight:700}
+.hint-cta{margin:6px 12px 8px;font-size:11px;color:#c07f8a;background:var(--red-wash);border-radius:8px;padding:7px 10px;display:flex;align-items:center;gap:6px}
+.demo-foot{text-align:center;font-size:10px;color:var(--hint);padding:8px 0 110px}
+.fb-swap{flex-shrink:0;font-size:13px;color:var(--link);font-weight:600;cursor:pointer;padding:6px 4px}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="statusbar"><span>6:13</span><span class="sb-r"><span class="sig"><i></i><i></i><i></i><i></i></span><span class="wifi"></span><span class="batt"></span></span></div>
+
+  <div class="dd-top">
+    <span class="back" onclick="history.back()">‹</span>
+    <div class="dd-box"><span class="dd-avatar">点点</span><span class="q">帐篷怎么选</span><span style="font-size:13px">🔍</span></div>
+  </div>
+
+  <div class="guide">
+    <div class="guide-head"><span class="dd-avatar" style="width:24px;height:24px;font-size:10px">点点</span><span class="gt">帐篷怎么选？公园野餐党实用攻略</span><span class="gsub">参考 56 篇笔记</span></div>
+    <div class="g-sec">
+      <h5>速开帐篷 <span class="tag">3-5人 · 公园野餐主流</span></h5>
+      <p>代表：<span class="g-link">牧高笛 零动155</span>、<span class="g-link">迪卡侬 Quechua 2秒</span>。3秒内自动弹开，新手零门槛；缺点是收纳后偏长，地铁通勤略占手。用户反馈：带娃家庭、野餐党好评率高。</p>
+    </div>
+    <div class="g-sec">
+      <h5>传统杆帐篷 <span class="tag">空间利用率高</span></h5>
+      <p>代表：<span class="g-link">挪客 ango 三人款</span>。铝合金杆+四面开窗，透气和抗风更好，但搭建需要 5-10 分钟。用户反馈：适合自驾露营、过夜场景。</p>
+    </div>
+    <div class="g-sec">
+      <h5>怎么选（通用）</h5>
+      <ul>
+        <li>人数 3 人以上 → 优先一室一厅（如零动155）</li>
+        <li>地铁/公交通勤携带 → 重量控制在 3.5kg 内</li>
+        <li>要过夜 → 防水看 PU2000mm 以上</li>
+        <li>预算 150-300 元区间三款口碑最集中</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sec-label"><b>相关商品</b><span>勾选 2-3 件，用「比比」横着比</span></div>
+  <div class="hint-cta">⚖️ 还在纠结选哪件？勾选后点「比一比」——AI 翻笔记帮你按维度拉证据</div>
+  <div id="cards"></div>
+  <div class="demo-foot">演示 Demo · 笔记与商品数据均为虚构（mock）</div>
+
+  <div class="float-bar" id="fbar">
+    <div class="fb-thumbs" id="fbt"></div>
+    <div class="fb-text" id="fbx"></div>
+    <span class="fb-swap" id="swap" style="display:none" onclick="swapAll()">换一换</span>
+    <button class="fb-btn" id="fbb" onclick="goNext()">比一比这N件 →</button>
+  </div>
+</div>
+
+<script src="assets/demo.js"></script>
+<script>
+let sel=new Set(), prefilled=false, revealed=false;
+const mode=getParam('mode');
+
+function render(){
+  document.getElementById('cards').innerHTML=skuList().map(s=>`
+  <div class="sku-card ${sel.has(s.id)?'sel':''}" onclick="toggle('${s.id}')">
+    ${skuThumbHtml(s)}
+    <div class="sku-info">
+      <div class="sku-name">${s.name}</div>
+      <div class="sku-meta"><span class="sku-price"><small style="font-size:11px">¥</small>${s.price}</span><span class="sku-sold">${s.sold} · 12篇笔记在讨论</span></div>
+      <div class="sku-tags">${s.tags.map(t=>`<span>${t}</span>`).join('')}</div>
+    </div>
+    <span class="cb ${revealed?'show':''} ${sel.has(s.id)?'on':''}"></span>
+  </div>`).join('');
+  const bar=document.getElementById('fbar'), txt=document.getElementById('fbx'),
+        btn=document.getElementById('fbb'), sw=document.getElementById('swap');
+  if(sel.size===0){ bar.classList.remove('show'); return; }
+  bar.classList.add('show');
+  document.getElementById('fbt').innerHTML=skuList().filter(s=>sel.has(s.id)).map(s=>skuThumbHtml(s,'fb-thumb')).join('');
+  if(prefilled && sel.size===3){
+    txt.innerHTML='<b>帮你预选了3件</b><br>不想比这些？';
+    btn.textContent='比一比这3件 →'; btn.disabled=false; sw.style.display='';
+  }else{
+    sw.style.display='none'; prefilled=false;
+    if(sel.size<2){ txt.innerHTML=`已选${sel.size}件`; btn.disabled=true; btn.textContent='再勾1件就可以比啦'; }
+    else{ txt.innerHTML=`已选${sel.size}件`; btn.disabled=false; btn.textContent=`比一比这${sel.size}件 →`; }
+  }
+}
+function toggle(id){
+  revealed=true;
+  if(sel.has(id)) sel.delete(id);
+  else{
+    if(sel.size>=3){ toast('最多比3件哦'); return; }
+    sel.add(id);
+  }
+  render();
+}
+function swapAll(){ prefilled=false; sel.clear(); render(); toast('已清空，手动勾选你想比的'); }
+function goNext(){
+  if(sel.size<2) return;
+  store('bb_skus',[...sel]);
+  location.href='dimensions.html';
+}
+// F49：购物车抽屉「去点点搜搜」跳入——真实版为用户输入搜索词，demo直接落mock搜索内容，toast标注
+if(getParam('from')==='cart') toast('演示：真实版会先让你输入想搜什么，这里直接展示mock结果');
+if(mode==='prefill3'){ prefilled=true; revealed=true; SKU_ORDER.forEach(id=>sel.add(id)); }
+render();
+</script>
+</body>
+</html>
